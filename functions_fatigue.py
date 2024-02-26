@@ -163,8 +163,16 @@ def Video_detection(video_path):
 face_detection = dlib.get_frontal_face_detector()
 face_landmark = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-# test the program on one video:
+# # test the program on one video:
+#
+# Video_detection('half.mp4')
+# print("done")
 
-Video_detection('half.mp4')
+# test the program on multiple videos:
+dossier = "input"
+# Boucle pour parcourir tous les fichiers du dossier
+for file_name in os.listdir(dossier):
+    # Obtenez le chemin complet du fichier en utilisant os.path.join
+    full_path = os.path.join(dossier, file_name)
+    Video_detection(full_path)
 print("done")
-
