@@ -165,6 +165,9 @@ face_detection = dlib.get_frontal_face_detector()
 face_landmark = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # test the program :
+#
+# Video_detection('half.mp4')
+
 
 dossier = "input"
 # Boucle pour parcourir tous les fichiers du dossier
@@ -172,3 +175,11 @@ for file_name in os.listdir(dossier):
     # Obtenez le chemin complet du fichier en utilisant os.path.join
     full_path = os.path.join(dossier, file_name)
     Video_detection(full_path)
+
+# Initialize pygame
+pygame.init()
+# Load the sound file
+sound_file = "alert.wav"
+pygame.mixer.music.load(sound_file)
+# Set the volume (optional)
+pygame.mixer.music.set_volume(1.0)

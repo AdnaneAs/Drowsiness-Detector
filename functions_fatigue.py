@@ -2,7 +2,6 @@ import csv
 import cv2
 import dlib
 from scipy.spatial import distance
-import pygame
 import time
 import os
 
@@ -78,6 +77,7 @@ def save_to_csv(ear, filename):
         if file.tell() == 0:
             writer.writerow(['Ear', 'Time'])
         writer.writerow([ear, f"{int(hours)}:{int(minutes)}:{int(seconds)}"])
+    file.close()
 
 
 def image_processing(selected_frames):
@@ -102,7 +102,6 @@ def image_processing(selected_frames):
         # améliorer la luminosité de l'image.
         luminosite = cv2.convertScaleAbs(gray, alpha=1.2, beta=30)
 
-
         # Save the processed frame to the new directory
         cv2.imwrite(f"output_frames/gray/frame_{i}.jpg", gray)
         cv2.imwrite(f"output_frames/bilaterale/frame_{i}.jpg", bilateral)
@@ -117,7 +116,8 @@ def Video_detection(video_path):
     selected_frames, all_frames, frame_rate, frame_width, frame_height = split_video_frames(video_path)
 
     # Generate a new video with face and age detection
-    output_video_path = f"output_video{time.time()}.mp4"
+    os.makedirs("output_videos", exist_ok=True)
+    output_video_path = f"output_videos/video{time.time()}.mp4"
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_video_path, fourcc, frame_rate, (frame_width, frame_height))
     counter = []
@@ -143,11 +143,12 @@ def Video_detection(video_path):
             cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
 
             ear = eye_aspect_ratio(eye)
-            save_to_csv(ear, 'ear.csv')
+            os.makedirs("output_ear_data", exist_ok=True)
+            save_to_csv(ear, 'output_ear_data/ear.csv')
             if ear < 0.285:
                 counter.append(1)
                 if len(counter) > 3:
-                    save_to_csv(ear, 'detection.csv')
+                    save_to_csv(ear, 'output_ear_data/detected_fatigue_data.csv')
                     cv2.putText(frame, "Fatigue Detected", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             else:
                 counter = []
@@ -158,18 +159,12 @@ def Video_detection(video_path):
     out.release()
 
 
-
 # initialize the Model :
 face_detection = dlib.get_frontal_face_detector()
 face_landmark = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-# Initialize pygame
-pygame.init()
-# Load the sound file
-sound_file = "alert.wav"
-pygame.mixer.music.load(sound_file)
-# Set the volume (optional)
-pygame.mixer.music.set_volume(1.0)
+# test the program on one video:
 
-# test the program :
 Video_detection('half.mp4')
+print("done")
+
