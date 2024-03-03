@@ -80,6 +80,9 @@ def save_to_csv(ear, filename):
     file.close()
 
 
+number = 0
+
+
 def image_processing(selected_frames):
     # Create a new directory to store the processed frames
     os.makedirs("output_frames", exist_ok=True)
@@ -96,31 +99,33 @@ def image_processing(selected_frames):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         bilateral = cv2.bilateralFilter(gray, 9, 75, 75)
         canny = cv2.Canny(gray, 50, 150)
-        morph = cv2.morphologyEx(canny, cv2.MORPH_CLOSE, (5, 5))
+        morph = cv2.morphologyEx(canny, cv2.MORPH_CLOSE, (15, 15))
         # améliorer le contraste global de l'image.
         egalisation = cv2.equalizeHist(gray)
         # améliorer la luminosité de l'image.
         luminosite = cv2.convertScaleAbs(gray, alpha=1.2, beta=30)
 
         # Save the processed frame to the new directory
-        cv2.imwrite(f"output_frames/gray/frame_{i}.jpg", gray)
-        cv2.imwrite(f"output_frames/bilaterale/frame_{i}.jpg", bilateral)
-        cv2.imwrite(f"output_frames/canny/frame_{i}.jpg", canny)
-        cv2.imwrite(f"output_frames/morphologie/frame_{i}.jpg", morph)
-        cv2.imwrite(f"output_frames/egalization/frame_{i}.jpg", egalisation)
-        cv2.imwrite(f"output_frames/luminosite/frame_{i}.jpg", luminosite)
+        cv2.imwrite(f"output_frames/gray/frame_{number}_{i}.jpg", gray)
+        cv2.imwrite(f"output_frames/bilaterale/frame_{number}_{i}.jpg", bilateral)
+        cv2.imwrite(f"output_frames/canny/frame_{number}_{i}.jpg", canny)
+        cv2.imwrite(f"output_frames/morphologie/frame_{number}_{i}.jpg", morph)
+        cv2.imwrite(f"output_frames/egalization/frame_{number}_{i}.jpg", egalisation)
+        cv2.imwrite(f"output_frames/luminosite/frame_{number}_{i}.jpg", luminosite)
 
 
-def Video_detection(video_path):
+def Video_detection(video_path, output_path):
     # take a video and split it into frames:
     selected_frames, all_frames, frame_rate, frame_width, frame_height = split_video_frames(video_path)
 
     # Generate a new video with face and age detection
     os.makedirs("output_videos", exist_ok=True)
-    output_video_path = f"output_videos/video{time.time()}.mp4"
+    output_video_path = output_path
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_video_path, fourcc, frame_rate, (frame_width, frame_height))
     counter = []
+    global number
+    number += 1
     image_processing(selected_frames)
     for frame in all_frames:
         # Convert the frame to grayscale
@@ -173,6 +178,7 @@ dossier = "input"
 # Boucle pour parcourir tous les fichiers du dossier
 for file_name in os.listdir(dossier):
     # Obtenez le chemin complet du fichier en utilisant os.path.join
+    output_path = f"output_videos/video{time.time()}.mp4"
     full_path = os.path.join(dossier, file_name)
-    Video_detection(full_path)
+    Video_detection(full_path,output_path)
 print("done")
