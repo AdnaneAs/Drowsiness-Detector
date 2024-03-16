@@ -1,25 +1,25 @@
-def display_video(self):
-    # ghadi iqra lina  lvideo kaml
+def display_video_3(self):
     cap = cv2.VideoCapture(self.output_path)
-    while True:
+    # Get the frame rate of the video
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    # Loop through the video frames
+    while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
-        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # display image
-        self.ui.framing.setPixmap(QPixmap.fromImage(
-            QtGui.QImage(rgb_image, rgb_image.shape[1], rgb_image.shape[0], QtGui.QImage.Format_RGB888)))
+        height, width, channel = frame.shape
+        bytes_per_line = 3 * width
+
+        q_img = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap.fromImage(q_img)
+        self.ui.framing.setPixmap(pixmap)
+
+        # Break the loop if the 'q' key is pressed
+        if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
+            break
+
+    # Release the video capture object and close OpenCV windows
     cap.release()
-
-
-def display_video_2(self):
-    clip = VideoFileClip(self.output_path)
-
-    total_frames = int(clip.duration * clip.fps)
-
-    for i in range(total_frames):
-        frame = clip.get_frame(i / clip.fps)
-        self.ui.framing.setPixmap(QPixmap(frame))
-
-    clip.close()
+    cv2.destroyAllWindows()
