@@ -200,7 +200,7 @@ class MainWindow(QMainWindow):
             self.ui.framing.setPixmap(pixmap)
 
             # Break the loop if the 'q' key is pressed
-            if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
+            if cv2.waitKey(int(1000 / fps-10)) & 0xFF == ord('q'):
                 break
 
         # Release the video capture object and close OpenCV windows
