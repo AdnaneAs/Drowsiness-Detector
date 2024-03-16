@@ -26,30 +26,13 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 
 ##############
 
-class VideoThread(QThread):
-    change_pixmap_signal = QtCore.pyqtSignal(QtGui.QImage)
-
-    def __init__(self, input_path):
-        super(VideoThread, self).__init__()
-        self.input_path = input_path
-
-    def run(self):
-        cap = cv2.VideoCapture(self.input_path)
-        while True:
-            ret, frame = cap.read()
-            if ret:
-                self.change_pixmap_signal.emit(frame)
-            else:
-                break
-        cap.release()
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         self.file_data = None
         self.file_data_1 = None
         self.output_path = "./output_videos_APP/video1708978940.5596116.mp4"
@@ -74,16 +57,13 @@ class MainWindow(QMainWindow):
         self.ui.framing.setScaledContents(True)
 
         ########################################################################
-        self.ui.playvideobtn_2.clicked.connect(self.display_video)
+        self.ui.playvideobtn_2.clicked.connect(self.display_video_3)
         self.ui.pushButton_4.clicked.connect(self.upload_data_file)
-
-        self.th = VideoThread(self)
-
-
 
     @QtCore.pyqtSlot(QtGui.QImage)
     def setImage(self, image):
         self.ui.framing.setPixmap(QtGui.QPixmap.fromImage(image))
+
     ########################################################################
 
     def Cancel(self):
@@ -189,7 +169,7 @@ class MainWindow(QMainWindow):
             return None
         else:
             video_input_path = self.output_path
-            # video_input_path = "./output_videos_APP/video1708978940.5596116.mp4"
+
             id = video_input_path.split("/")[-1].split(".")[0]
             img_output_path = f'./output_videos_APP/{id}_thumbnail.jpg'
 
@@ -199,25 +179,38 @@ class MainWindow(QMainWindow):
             clip.close()
             return img_output_path
 
-    def display_video(self):
-        # ghadi iqra lina  lvideo kaml
+
+
+    def display_video_3(self):
         cap = cv2.VideoCapture(self.output_path)
-        while True:
+        # Get the frame rate of the video
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        # Loop through the video frames
+        while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
                 break
-            rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            # display image
-            self.ui.framing.setPixmap(QPixmap.fromImage(
-                QtGui.QImage(rgb_image, rgb_image.shape[1], rgb_image.shape[0], QtGui.QImage.Format_RGB888)))
+            height, width, channel = frame.shape
+            bytes_per_line = 3 * width
+
+            q_img = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+            pixmap = QPixmap.fromImage(q_img)
+            self.ui.framing.setPixmap(pixmap)
+
+            # Break the loop if the 'q' key is pressed
+            if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
+                break
+
+        # Release the video capture object and close OpenCV windows
         cap.release()
-
+        cv2.destroyAllWindows()
 
     def checkoutput(self):
         try:
             self.ui.stackedWidget.setCurrentIndex(1)
-            print("dazt lpage")
+            print("dazt lpage play video")
             image_path = self.create_thumbnail()
             print("thumbnail created ", image_path)
             self.ui.framing.setScaledContents(True)
@@ -225,6 +218,7 @@ class MainWindow(QMainWindow):
             self.ui.playvideobtn_2.setEnabled(True)
         except Exception as e:
             self.inserttext(f"Error playing the video: {e}")
+            self.ui.playvideobtn_2.setEnabled(False)
             print(f"Error playing the video: {e}")
 
     def Video_detection(self, file_path):
