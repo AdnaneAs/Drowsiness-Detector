@@ -35,66 +35,69 @@ def save_to_csv(ear, filename):
         writer.writerow([ear, f"{int(hours)}:{int(minutes)}:{int(seconds)}"])
     file.close()
 
+def launch_detection():
+    cap = cv2.VideoCapture(0)
+    face_detection = dlib.get_frontal_face_detector()
+    face_landmark = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    counter = []
+    # Initialize pygame
+    pygame.init()
 
-cap = cv2.VideoCapture(0)
-face_detection = dlib.get_frontal_face_detector()
-face_landmark = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-counter = []
-# Initialize pygame
-pygame.init()
+    # Load the sound file
+    sound_file = "alert.wav"
+    pygame.mixer.music.load(sound_file)
 
-# Load the sound file
-sound_file = "alert.wav"
-pygame.mixer.music.load(sound_file)
+    # Set the volume (optional)
+    pygame.mixer.music.set_volume(1.0)
 
-# Set the volume (optional)
-pygame.mixer.music.set_volume(1.0)
+    while True:
+        ret, frame = cap.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_detection(gray)
+        # bouclé sur les visages détectés
+        for face in faces:
+            face_landmarks = face_landmark(gray, face)
+            eye = []
 
-while True:
-    ret, frame = cap.read()
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_detection(gray)
-    # bouclé sur les visages détectés
-    for face in faces:
-        face_landmarks = face_landmark(gray, face)
-        eye = []
+            for n in range(36, 48):
+                x = face_landmarks.part(n).x
+                y = face_landmarks.part(n).y
+                cv2.circle(frame, (x, y), 2, (0, 255, 0), 1)
+                eye.append((x, y))
+            # cette partie est pour dessiner les yeux avec des lignes enchainées
+            # Convert the list to a NumPy array
+            eye_array = np.array(eye, dtype=np.int32)
 
-        for n in range(36, 48):
-            x = face_landmarks.part(n).x
-            y = face_landmarks.part(n).y
-            cv2.circle(frame, (x, y), 2, (0, 255, 0), 1)
-            eye.append((x, y))
-        # cette partie est pour dessiner les yeux avec des lignes enchainées
-        # Convert the list to a NumPy array
-        eye_array = np.array(eye, dtype=np.int32)
+            # Reshape the array to have two sets of 6 coordinates (2 eyes, each with 6 landmarks)
+            eye_array = eye_array.reshape(2, 6, 2)
+            for eye_landmarks in eye_array:
+                cv2.polylines(frame, [eye_landmarks], isClosed=True, color=(0, 255, 255), thickness=1)
 
-        # Reshape the array to have two sets of 6 coordinates (2 eyes, each with 6 landmarks)
-        eye_array = eye_array.reshape(2, 6, 2)
-        for eye_landmarks in eye_array:
-            cv2.polylines(frame, [eye_landmarks], isClosed=True, color=(0, 255, 255), thickness=1)
+            # Draw rectangles around the face
+            x1 = face.left()
+            y1 = face.top()
+            x2 = face.right()
+            y2 = face.bottom()
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
+            ear = eye_aspect_ratio(eye)
 
-        # Draw rectangles around the face
-        x1 = face.left()
-        y1 = face.top()
-        x2 = face.right()
-        y2 = face.bottom()
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
-        ear = eye_aspect_ratio(eye)
+            os.makedirs("output_ear_data", exist_ok=True)
+            save_to_csv(ear, 'output_ear_data/ear_live.csv')
+            if ear < 0.22:
+                counter.append(1)
+                if len(counter) > 2:
+                    # Save the detected fatigue data to a CSV file
+                    save_to_csv(ear, 'output_ear_data/detected_fatigue_data_live.csv')
+                    pygame.mixer.music.play()
+                    pygame.time.wait(200)
+                    cv2.putText(frame, "Fatigue Detected", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            else:
+                counter = []
+            print(counter)
 
-        os.makedirs("output_ear_data", exist_ok=True)
-        save_to_csv(ear, 'output_ear_data/ear_live.csv')
-        if ear < 0.22:
-            counter.append(1)
-            if len(counter) > 2:
-                # Save the detected fatigue data to a CSV file
-                save_to_csv(ear, 'output_ear_data/detected_fatigue_data_live.csv')
-                pygame.mixer.music.play()
-                pygame.time.wait(200)
-                cv2.putText(frame, "Fatigue Detected", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        else:
-            counter = []
-        print(counter)
+        cv2.imshow("Frame", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-    cv2.imshow("Frame", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+
+launch_detection()
