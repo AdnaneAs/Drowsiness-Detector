@@ -14,10 +14,10 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog,
 
 from PyQt5 import QtWidgets, QtCore, QtGui, QtMultimedia
 from script import Ui_MainWindow
-
+import live_detection_fatigue_app as lv
 ###################
 
-from PyQt5.QtCore import Qt, QUrl, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QUrl, QThread, pyqtSignal, QFile, QTextStream
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsScene, QGraphicsView
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -60,11 +60,44 @@ class MainWindow(QMainWindow):
         self.ui.playvideobtn_2.clicked.connect(self.display_video_3)
         self.ui.pushButton_4.clicked.connect(self.upload_data_file)
 
-    @QtCore.pyqtSlot(QtGui.QImage)
-    def setImage(self, image):
-        self.ui.framing.setPixmap(QtGui.QPixmap.fromImage(image))
+        self.ui.endbtn.hide()
+        self.ui.endbtn.clicked.connect(self.end)
+        self.ui.launchbtn.clicked.connect(self.livelaunch)
+        self.livecap = None
 
     ########################################################################
+    def end(self):
+        print("end done")
+        # reset the living qlabel
+        self.is_live = False
+        # Release the video capture object and close OpenCV windows
+        self.livecap.release()
+        cv2.destroyAllWindows()
+        self.ui.living.clear()
+
+    def livelaunch(self):
+        print("live launch done")
+        self.livecap = cv2.VideoCapture(0)
+        # Get the frame rate of the video
+        fps = self.livecap.get(cv2.CAP_PROP_FPS)
+        # Loop through the video frames
+        while self.livecap.isOpened():
+            ret, init_frame = self.livecap.read()
+            if not ret:
+                break
+            # frame = lv.detect_fatigue(init_frame)
+            frame = init_frame
+            height, width, channel = frame.shape
+            bytes_per_line = 3 * width
+
+            q_img = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+            pixmap = QPixmap.fromImage(q_img)
+            self.ui.living.setPixmap(pixmap)
+
+            # Break the loop if the endbtn is pressed
+            if cv2.waitKey(int(1000 / fps - 10)) & 0xFF == ord('q'):
+                break
+
 
     def Cancel(self):
         self.ui.filepath.setText("")
@@ -179,7 +212,9 @@ class MainWindow(QMainWindow):
             clip.close()
             return img_output_path
 
-
+    @QtCore.pyqtSlot(QtGui.QImage)
+    def setImage(self, image):
+        self.ui.framing.setPixmap(QtGui.QPixmap.fromImage(image))
 
     def display_video_3(self):
         cap = cv2.VideoCapture(self.output_path)
@@ -247,13 +282,18 @@ class MainWindow(QMainWindow):
             self.inserttext("Please select a file or a folder to launch the detection")
 
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     ## loading style file
-    # with open("style.qss", "r") as style_file:
-    #     style_str = style_file.read()
-    # app.setStyleSheet(style_str)
+    with open("style.qss", "r") as style_file:
+        style_str = style_file.read()
+    app.setStyleSheet(style_str)
+    # style_file = QFile("style.qss")
+    # style_file.open(QFile.ReadOnly | QFile.Text)
+    # style_stream = QTextStream(style_file)
+    # app.setStyleSheet(style_stream.readAll())
 
     window = MainWindow()
     window.show()

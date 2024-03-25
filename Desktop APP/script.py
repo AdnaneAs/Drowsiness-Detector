@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(692, 538)
+        MainWindow.resize(694, 549)
         MainWindow.setStyleSheet("/* Style for first menu widget  */\n"
 "#main_menu_widget {\n"
 "    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(188, 231, 215, 255), stop:1 rgba(122, 215, 255, 255));\n"
@@ -70,14 +70,15 @@ class Ui_MainWindow(object):
 "    padding-left:5px;\n"
 "}\n"
 "\n"
-"/* Style for main widget  */\n"
+"/* Style for main widget  \n"
 "#main_widget {\n"
 "    border-left: 5px solid #434343;\n"
 "    border-right: 5px solid #434343;\n"
 "    border-bottom: 5px solid #434343;\n"
+"    border-top: 5px solid #434343;\n"
 "}\n"
 "\n"
-"")
+"*/")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -89,7 +90,7 @@ class Ui_MainWindow(object):
         self.main_menu_widget.setMinimumSize(QtCore.QSize(0, 30))
         self.main_menu_widget.setMaximumSize(QtCore.QSize(16777215, 40))
         self.main_menu_widget.setAutoFillBackground(False)
-        self.main_menu_widget.setStyleSheet("background-color:rgb(177, 164, 96)")
+        self.main_menu_widget.setStyleSheet("background-color:#93BFCF;border-radius:2px;")
         self.main_menu_widget.setObjectName("main_menu_widget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.main_menu_widget)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -242,8 +243,8 @@ class Ui_MainWindow(object):
         self.shell.setFont(font)
         self.shell.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.BusyCursor))
         self.shell.setAutoFillBackground(False)
-        self.shell.setStyleSheet("background-color:rgb(0, 85, 127);color:rgb(255, 255, 127)\n"
-"")
+        self.shell.setStyleSheet("background-color:rgb(0, 85, 127);color:rgb(255, 255, 127);\n"
+"border-radius : 6px;")
         self.shell.setPlainText("")
         self.shell.setObjectName("shell")
         self.checkoutputbtn = QtWidgets.QPushButton(self.widget)
@@ -253,13 +254,14 @@ class Ui_MainWindow(object):
         self.cancelbtn = QtWidgets.QPushButton(self.widget)
         self.cancelbtn.setEnabled(True)
         self.cancelbtn.setGeometry(QtCore.QRect(250, 270, 141, 23))
+        self.cancelbtn.setStyleSheet("")
         self.cancelbtn.setObjectName("cancelbtn")
         self.gridLayout_11.addWidget(self.widget, 0, 0, 1, 1)
         self.stackedWidget.addWidget(self.pageupload)
         self.framebyframe = QtWidgets.QWidget()
         self.framebyframe.setObjectName("framebyframe")
         self.label_6 = QtWidgets.QLabel(self.framebyframe)
-        self.label_6.setGeometry(QtCore.QRect(500, 60, 141, 21))
+        self.label_6.setGeometry(QtCore.QRect(520, 60, 141, 21))
         font = QtGui.QFont()
         font.setFamily("Poppins Medium")
         font.setPointSize(10)
@@ -267,20 +269,67 @@ class Ui_MainWindow(object):
         self.label_6.setStyleSheet("text-align: center;")
         self.label_6.setObjectName("label_6")
         self.playvideobtn_2 = QtWidgets.QPushButton(self.framebyframe)
-        self.playvideobtn_2.setGeometry(QtCore.QRect(520, 340, 75, 23))
+        self.playvideobtn_2.setGeometry(QtCore.QRect(550, 350, 75, 23))
         self.playvideobtn_2.setObjectName("playvideobtn_2")
         self.framing = QtWidgets.QLabel(self.framebyframe)
-        self.framing.setGeometry(QtCore.QRect(30, 40, 411, 351))
+        self.framing.setGeometry(QtCore.QRect(20, 50, 471, 351))
         self.framing.setStyleSheet("background-color:#4d5056;")
         self.framing.setText("")
         self.framing.setScaledContents(True)
         self.framing.setObjectName("framing")
         self.stackedWidget.addWidget(self.framebyframe)
         self.pagelive = QtWidgets.QWidget()
+        self.pagelive.setStyleSheet("")
         self.pagelive.setObjectName("pagelive")
-        self.displaylabel = QtWidgets.QLabel(self.pagelive)
-        self.displaylabel.setGeometry(QtCore.QRect(370, 200, 47, 13))
-        self.displaylabel.setObjectName("displaylabel")
+        self.living = QtWidgets.QLabel(self.pagelive)
+        self.living.setGeometry(QtCore.QRect(-10, -10, 691, 491))
+        self.living.setStyleSheet("background-color:#4d5056;")
+        self.living.setText("")
+        self.living.setScaledContents(True)
+        self.living.setObjectName("living")
+        self.start_frame = QtWidgets.QFrame(self.pagelive)
+        self.start_frame.setGeometry(QtCore.QRect(160, 120, 381, 211))
+        font = QtGui.QFont()
+        font.setFamily("Poppins Medium")
+        self.start_frame.setFont(font)
+        self.start_frame.setStyleSheet("background:rgb(220, 220, 220);\n"
+"border-radius: 10px;")
+        self.start_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.start_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.start_frame.setObjectName("start_frame")
+        self.label_2 = QtWidgets.QLabel(self.start_frame)
+        self.label_2.setGeometry(QtCore.QRect(170, 10, 41, 41))
+        self.label_2.setAutoFillBackground(False)
+        self.label_2.setText("")
+        self.label_2.setPixmap(QtGui.QPixmap("./icon/alert.png"))
+        self.label_2.setScaledContents(True)
+        self.label_2.setObjectName("label_2")
+        self.label_5 = QtWidgets.QLabel(self.start_frame)
+        self.label_5.setGeometry(QtCore.QRect(60, 70, 261, 20))
+        font = QtGui.QFont()
+        font.setFamily("Poppins Medium")
+        self.label_5.setFont(font)
+        self.label_5.setObjectName("label_5")
+        self.launchbtn = QtWidgets.QPushButton(self.start_frame)
+        self.launchbtn.setGeometry(QtCore.QRect(150, 150, 75, 31))
+        font = QtGui.QFont()
+        font.setFamily("Poppins Medium")
+        self.launchbtn.setFont(font)
+        self.launchbtn.setStyleSheet("box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);\n"
+"color : rgb(255, 255, 0);\n"
+"background : black;\n"
+"border-radius: 5px;")
+        self.launchbtn.setObjectName("launchbtn")
+        self.endbtn = QtWidgets.QPushButton(self.pagelive)
+        self.endbtn.setGeometry(QtCore.QRect(310, 410, 75, 31))
+        font = QtGui.QFont()
+        font.setFamily("Poppins Medium")
+        self.endbtn.setFont(font)
+        self.endbtn.setStyleSheet("box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);\n"
+"color : white;\n"
+"background : black;\n"
+"border-radius: 5px;")
+        self.endbtn.setObjectName("endbtn")
         self.stackedWidget.addWidget(self.pagelive)
         self.pagedata = QtWidgets.QWidget()
         self.pagedata.setObjectName("pagedata")
@@ -331,13 +380,17 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(2)
         self.selectfolderbtn.clicked.connect(self.frame.hide) # type: ignore
         self.selectfilebtn.clicked.connect(self.frame_3.hide) # type: ignore
         self.cancelbtn.clicked.connect(self.frame_3.show) # type: ignore
         self.cancelbtn.clicked.connect(self.frame.show) # type: ignore
         self.selectfilebtn.clicked.connect(self.cancelbtn.show) # type: ignore
         self.selectfolderbtn.clicked.connect(self.cancelbtn.show) # type: ignore
+        self.endbtn.clicked.connect(self.start_frame.show) # type: ignore
+        self.launchbtn.clicked.connect(self.start_frame.hide) # type: ignore
+        self.launchbtn.clicked.connect(self.endbtn.show) # type: ignore
+        self.endbtn.clicked.connect(self.endbtn.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -357,7 +410,9 @@ class Ui_MainWindow(object):
         self.cancelbtn.setText(_translate("MainWindow", "cancel"))
         self.label_6.setText(_translate("MainWindow", "Output Video Player"))
         self.playvideobtn_2.setText(_translate("MainWindow", "Play Video"))
-        self.displaylabel.setText(_translate("MainWindow", "live"))
+        self.label_5.setText(_translate("MainWindow", "Click if You Are Ready to launch the Live Detection"))
+        self.launchbtn.setText(_translate("MainWindow", "Launch"))
+        self.endbtn.setText(_translate("MainWindow", "End Live"))
         self.label_3.setText(_translate("MainWindow", "Visualize Data"))
         self.label_19.setText(_translate("MainWindow", "Selectionner les Données: "))
         self.pushButton_4.setText(_translate("MainWindow", "  Select File"))
